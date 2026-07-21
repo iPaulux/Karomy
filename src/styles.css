@@ -225,6 +225,49 @@ button { font-family: inherit; }
   padding-left: 0.35em; /* compense le letter-spacing de fin */
 }
 
+/* --- Sélecteur segmenté --------------------------------------------------- */
+/* Deux onglets dans une gouttière creusée, façon interrupteur en bois. */
+
+.segmented {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  padding: 4px;
+  background: var(--cream-deep);
+  border: 3px solid var(--cream-deep);
+  border-radius: 999px;
+}
+
+.segmented button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 12px;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.segmented button[aria-selected='true'] {
+  color: var(--walnut);
+  background: var(--parchment);
+  box-shadow: var(--shadow-sm);
+}
+
+.segmented button:focus-visible {
+  outline: 3px solid var(--sky-deep);
+  outline-offset: 2px;
+}
+
 /* --- Divers -------------------------------------------------------------- */
 
 .pill {

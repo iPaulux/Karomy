@@ -1,4 +1,4 @@
-import type { SearchResult } from './types'
+import type { SearchMode, SearchResult } from './types'
 
 /** Levée quand la fonction Netlify n'a pas de clé API configurée. */
 export class SearchUnavailableError extends Error {
@@ -14,9 +14,10 @@ export class SearchUnavailableError extends Error {
  */
 export async function searchKaraoke(
   query: string,
+  mode: SearchMode = 'karaoke',
   signal?: AbortSignal,
 ): Promise<SearchResult[]> {
-  const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`, {
+  const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&mode=${mode}`, {
     signal,
     headers: { accept: 'application/json' },
   })

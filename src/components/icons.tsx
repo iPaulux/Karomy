@@ -80,6 +80,14 @@ export const IconMic = ({ size }: IconProps) => (
   </Svg>
 )
 
+export const IconNote = ({ size }: IconProps) => (
+  <Svg size={size}>
+    <path d="M9 18V5l10-2v13" {...stroke} />
+    <circle cx="6.5" cy="18" r="2.6" {...stroke} />
+    <circle cx="16.5" cy="16" r="2.6" {...stroke} />
+  </Svg>
+)
+
 export const IconLink = ({ size }: IconProps) => (
   <Svg size={size}>
     <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 1 0-5.7-5.7L11.5 6.8" {...stroke} />

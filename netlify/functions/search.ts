@@ -29,6 +29,34 @@ function decodeEntities(text: string): string {
     .replace(/&amp;/g, '&')
 }
 
+interface Result {
+  videoId: string
+  title: string
+  channel: string
+  thumbnail: string
+}
+
+/** Marqueurs d'une version karaoké / instrumentale dans un titre ou une chaîne. */
+const KARAOKE_HINTS =
+  /karaok|karafun|instrumental|backing track|playback|sing[- ]?along|minus one|no vocals?|sans voix/i
+
+const isKaraoke = (r: Result) => KARAOKE_HINTS.test(`${r.title} ${r.channel}`)
+
+/** Mode karaoké : les vraies versions karaoké d'abord, le reste en secours. */
+function rankKaraokeFirst(results: Result[]): Result[] {
+  return [...results.filter(isKaraoke), ...results.filter((r) => !isKaraoke(r))]
+}
+
+/**
+ * Mode original : on écarte les versions karaoké. Si le filtre ne laisse rien
+ * (titre contenant « karaoke » de façon légitime, recherche trop pointue), on
+ * rend la liste brute plutôt qu'un écran vide.
+ */
+function rejectKaraoke(results: Result[]): Result[] {
+  const kept = results.filter((r) => !isKaraoke(r))
+  return kept.length > 0 ? kept : results
+}
+
 const json = (body: unknown, status: number, cacheSeconds = 0) =>
   new Response(JSON.stringify(body), {
     status,
@@ -46,7 +74,9 @@ export default async (req: Request, _context: Context): Promise<Response> => {
     return json({ error: 'YOUTUBE_API_KEY non configurée' }, 501)
   }
 
-  const query = new URL(req.url).searchParams.get('q')?.trim()
+  const params = new URL(req.url).searchParams
+
+  const query = params.get('q')?.trim()
   if (!query) {
     return json({ error: 'Paramètre `q` manquant' }, 400)
   }
@@ -54,16 +84,24 @@ export default async (req: Request, _context: Context): Promise<Response> => {
     return json({ error: 'Requête trop longue' }, 400)
   }
 
-  // On oriente la recherche vers le karaoké : ce sont les vidéos avec paroles
-  // incrustées, ce que la vue room attend.
+  // `karaoke` (défaut) : vidéos instrumentales avec paroles incrustées.
+  // `original` : le clip original, voix comprise — pour chanter par-dessus.
+  const mode = params.get('mode') === 'original' ? 'original' : 'karaoke'
+
   const endpoint = new URL('https://www.googleapis.com/youtube/v3/search')
   endpoint.searchParams.set('key', apiKey)
   endpoint.searchParams.set('part', 'snippet')
   endpoint.searchParams.set('type', 'video')
   endpoint.searchParams.set('videoEmbeddable', 'true')
   endpoint.searchParams.set('videoSyndicated', 'true')
-  endpoint.searchParams.set('maxResults', '12')
-  endpoint.searchParams.set('q', `${query} karaoke`)
+  // On demande large : le tri ci-dessous en écarte une partie, et il faut qu'il
+  // reste de quoi remplir les 12 résultats affichés.
+  endpoint.searchParams.set('maxResults', '25')
+  endpoint.searchParams.set('q', mode === 'karaoke' ? `${query} karaoke` : query)
+
+  // Catégorie « Music » : en mode original, ça écarte les reactions, lyric
+  // videos amateurs et autres contenus parasites.
+  if (mode === 'original') endpoint.searchParams.set('videoCategoryId', '10')
 
   let upstream: Response
   try {
@@ -80,7 +118,7 @@ export default async (req: Request, _context: Context): Promise<Response> => {
 
   const data = (await upstream.json()) as YouTubeSearchResponse
 
-  const results = (data.items ?? [])
+  const mapped = (data.items ?? [])
     .filter((item) => item.id?.videoId)
     .map((item) => ({
       videoId: item.id!.videoId!,
@@ -91,6 +129,14 @@ export default async (req: Request, _context: Context): Promise<Response> => {
         item.snippet?.thumbnails?.default?.url ??
         `https://i.ytimg.com/vi/${item.id!.videoId}/mqdefault.jpg`,
     }))
+
+  // L'opérateur `-` de YouTube ne fait qu'atténuer un terme, il ne l'exclut pas :
+  // sans ce tri côté serveur, une recherche « originale » remonte surtout des
+  // reprises karaoké, qui dominent les résultats pour les chansons connues.
+  const results = (mode === 'karaoke' ? rankKaraokeFirst(mapped) : rejectKaraoke(mapped)).slice(
+    0,
+    12,
+  )
 
   // Les résultats bougent peu : on met en cache 10 min au bord pour épargner
   // le quota YouTube (100 unités par recherche, 10 000 unités/jour par défaut).

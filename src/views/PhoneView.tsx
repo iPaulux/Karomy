@@ -9,15 +9,18 @@ import {
   IconCheck,
   IconDown,
   IconLink,
+  IconMic,
+  IconNote,
   IconPlus,
   IconSearch,
   IconSpinner,
   IconTrash,
   IconUp,
 } from '../components/icons'
-import type { SearchResult } from '../lib/types'
+import type { SearchMode, SearchResult } from '../lib/types'
 
 const NAME_KEY = 'karomy:singer'
+const MODE_KEY = 'karomy:mode'
 
 /**
  * Vue téléphone : on choisit un pseudo, on cherche une chanson, on l'ajoute.
@@ -252,10 +255,21 @@ function SearchPanel({
   // Si la fonction Netlify n'a pas de clé API, on bascule sur le collage de lien.
   const [linkMode, setLinkMode] = useState(false)
 
+  // Karaoké (instrumental + paroles) ou version originale avec la voix.
+  // Le choix est mémorisé : on a rarement envie d'en changer en cours de soirée.
+  const [mode, setMode] = useState<SearchMode>(
+    () => (localStorage.getItem(MODE_KEY) as SearchMode | null) ?? 'karaoke',
+  )
+
+  function chooseMode(next: SearchMode) {
+    setMode(next)
+    localStorage.setItem(MODE_KEY, next)
+  }
+
   const abortRef = useRef<AbortController | null>(null)
 
   // Recherche debouncée : on attend 400 ms de calme avant de taper l'API,
-  // le quota YouTube étant limité.
+  // le quota YouTube étant limité. Changer de mode relance la recherche.
   useEffect(() => {
     if (linkMode) return
 
@@ -273,7 +287,7 @@ function SearchPanel({
       setSearching(true)
       setMessage(null)
 
-      searchKaraoke(trimmed, controller.signal)
+      searchKaraoke(trimmed, mode, controller.signal)
         .then((found) => {
           setResults(found)
           if (found.length === 0) setMessage('Aucun résultat. Essaie un autre titre.')
@@ -295,7 +309,7 @@ function SearchPanel({
     }, 400)
 
     return () => clearTimeout(timer)
-  }, [query, linkMode])
+  }, [query, linkMode, mode])
 
   async function handleAdd(video: SearchResult) {
     try {
@@ -329,6 +343,27 @@ function SearchPanel({
 
   return (
     <section style={{ display: 'grid', gap: 12 }}>
+      {!linkMode && (
+        <div className="segmented" role="tablist" aria-label="Type de version">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'karaoke'}
+            onClick={() => chooseMode('karaoke')}
+          >
+            <IconMic size={17} /> Karaoké
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'original'}
+            onClick={() => chooseMode('original')}
+          >
+            <IconNote size={17} /> Originale
+          </button>
+        </div>
+      )}
+
       <form onSubmit={linkMode ? handleAddLink : (e) => e.preventDefault()} style={{ display: 'grid', gap: 8 }}>
         <div style={{ position: 'relative' }}>
           <span
@@ -349,7 +384,13 @@ function SearchPanel({
             style={{ paddingLeft: 48 }}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={linkMode ? 'Colle un lien YouTube' : 'Cherche un titre, un artiste…'}
+            placeholder={
+              linkMode
+                ? 'Colle un lien YouTube'
+                : mode === 'karaoke'
+                  ? 'Cherche une version karaoké…'
+                  : 'Cherche la version originale…'
+            }
             inputMode={linkMode ? 'url' : 'search'}
             autoComplete="off"
             aria-label={linkMode ? 'Lien YouTube' : 'Rechercher une chanson'}

@@ -23,6 +23,13 @@ export interface QueueItem {
   created_at: string
 }
 
+/**
+ * Type de version cherchée sur YouTube.
+ * - `karaoke` : instrumental avec paroles incrustées
+ * - `original` : le clip d'origine, voix comprise
+ */
+export type SearchMode = 'karaoke' | 'original'
+
 /** Résultat de recherche YouTube, avant ajout à la file. */
 export interface SearchResult {
   videoId: string

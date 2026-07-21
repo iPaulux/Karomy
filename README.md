@@ -15,6 +15,17 @@ d'attente. Pas de compte, pas d'installation.
 Les paroles viennent des vidéos karaoké YouTube (elles sont incrustées dans
 l'image) — rien à héberger.
 
+Sur le téléphone, un sélecteur permet de choisir entre deux types de version :
+
+- **Karaoké** — instrumental avec paroles à l'écran (par défaut)
+- **Originale** — le clip d'origine, voix comprise, pour chanter par-dessus
+
+Le choix est mémorisé dans le navigateur. YouTube ne sait pas vraiment exclure
+un terme (`-karaoke` ne fait qu'atténuer), donc le tri se fait côté serveur dans
+`netlify/functions/search.ts` : sans ça, une recherche « originale » remonte
+surtout des reprises karaoké, qui dominent les résultats pour les chansons
+connues.
+
 ## Stack
 
 - **Vite + React + TypeScript**
