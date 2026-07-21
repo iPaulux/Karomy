@@ -1,0 +1,321 @@
+/* ===========================================================================
+   Karomy — direction artistique "cozy Sims"
+   Palette pastel chaude, coins très ronds, ombres douces, plumbob vert.
+   Tout est fait main en CSS/SVG : aucun asset externe, la PWA reste légère.
+   =========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  /* Fonds — crème chaleureuse plutôt que blanc */
+  --cream:        #fdf6e9;
+  --cream-deep:   #f6e9d2;
+  --parchment:    #fffdf8;
+
+  /* Bois / mobilier */
+  --oak:          #c99b6b;
+  --oak-dark:     #a3764a;
+  --walnut:       #6b4a32;
+
+  /* Le vert plumbob, couleur d'accent principale */
+  --plumb:        #7fd44a;
+  --plumb-deep:   #56a827;
+  --plumb-glow:   #b7f183;
+
+  /* Accents secondaires pastel */
+  --blush:        #f4a7a0;
+  --blush-deep:   #d97b73;
+  --sky:          #8fc9e8;
+  --sky-deep:     #4f9ac4;
+  --butter:       #f7ce68;
+  --lilac:        #b9a6e0;
+
+  /* Texte */
+  --ink:          #4a3728;
+  --ink-soft:     #8a7461;
+  --ink-faint:    #b8a794;
+
+  /* Élévation — ombres chaudes, jamais grises */
+  --shadow-sm:    0 2px 0 rgba(107, 74, 50, 0.14);
+  --shadow-md:    0 4px 0 rgba(107, 74, 50, 0.16), 0 8px 24px rgba(107, 74, 50, 0.12);
+  --shadow-lg:    0 8px 0 rgba(107, 74, 50, 0.14), 0 18px 40px rgba(107, 74, 50, 0.18);
+
+  /* Rayons */
+  --r-sm:  12px;
+  --r-md:  20px;
+  --r-lg:  28px;
+  --r-xl:  40px;
+
+  --font-display: 'Baloo 2', system-ui, sans-serif;
+  --font-body:    'Nunito', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--cream);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+/* Papier peint : damier très doux + halo chaud, façon salon des Sims */
+.wallpaper {
+  min-height: 100%;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(247, 206, 104, 0.35), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 10% 110%, rgba(185, 166, 224, 0.28), transparent 70%),
+    repeating-linear-gradient(45deg, rgba(201, 155, 107, 0.05) 0 18px, transparent 18px 36px),
+    var(--cream);
+}
+
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+button { font-family: inherit; }
+
+/* --- Plumbob ------------------------------------------------------------- */
+/* Le losange vert qui flotte au-dessus des Sims. Signature de la marque. */
+
+.plumbob {
+  display: inline-block;
+  animation: plumbob-float 2.6s ease-in-out infinite;
+  transform-origin: center;
+  filter: drop-shadow(0 0 10px rgba(127, 212, 74, 0.6));
+}
+
+@keyframes plumbob-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-7px) rotate(6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plumbob { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --- Cartes -------------------------------------------------------------- */
+
+.card {
+  background: var(--parchment);
+  border: 3px solid var(--oak);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
+}
+
+.card-flat {
+  background: var(--parchment);
+  border: 2px solid var(--cream-deep);
+  border-radius: var(--r-md);
+  padding: 14px;
+}
+
+/* --- Boutons ------------------------------------------------------------- */
+/* Bord inférieur épais + enfoncement au clic : le côté "jouet" des Sims. */
+
+/* Le relief est piloté par deux variables : `--lift` (hauteur du bord bas)
+   et `--lift-color`. Variantes de couleur et de taille les redéfinissent
+   chacune de leur côté, sans jamais se marcher dessus. */
+
+.btn {
+  --lift: 5px;
+  --lift-color: var(--oak-dark);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 26px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--walnut);
+  background: var(--butter);
+  border: 3px solid var(--lift-color);
+  border-radius: 999px;
+  box-shadow: 0 var(--lift) 0 var(--lift-color);
+  cursor: pointer;
+  transition: transform 0.09s ease, box-shadow 0.09s ease, filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:hover:not(:disabled) { filter: brightness(1.05); }
+
+.btn:active:not(:disabled) {
+  transform: translateY(var(--lift));
+  box-shadow: 0 0 0 var(--lift-color);
+}
+
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn:focus-visible {
+  outline: 3px solid var(--sky-deep);
+  outline-offset: 3px;
+}
+
+/* Variantes de taille — déclarées avant les couleurs pour que `.btn-ghost`
+   puisse remettre `--lift` à zéro même combiné à `.btn-sm`. */
+.btn-sm { --lift: 4px; padding: 9px 16px; font-size: 0.9rem; }
+.btn-lg { padding: 18px 34px; font-size: 1.3rem; }
+
+/* Variantes de couleur */
+.btn-primary { --lift-color: var(--plumb-deep); background: var(--plumb); color: #1e4a08; }
+.btn-blush   { --lift-color: var(--blush-deep); background: var(--blush); color: #6d2a24; }
+.btn-sky     { --lift-color: var(--sky-deep);   background: var(--sky);   color: #143c53; }
+
+/* Le ghost est plat : pas de relief, quelle que soit la taille. */
+.btn-ghost {
+  --lift: 0px;
+  --lift-color: var(--cream-deep);
+  background: transparent;
+  color: var(--ink-soft);
+}
+
+.btn-icon {
+  width: 46px; height: 46px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* --- Champs -------------------------------------------------------------- */
+
+.field {
+  width: 100%;
+  padding: 15px 18px;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--parchment);
+  border: 3px solid var(--cream-deep);
+  border-radius: var(--r-md);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field::placeholder { color: var(--ink-faint); font-weight: 500; }
+
+.field:focus {
+  border-color: var(--plumb);
+  box-shadow: 0 0 0 4px rgba(127, 212, 74, 0.22);
+}
+
+/* Le champ "code de room" : gros, monospace, très espacé */
+.field-code {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.35em;
+  text-align: center;
+  text-transform: uppercase;
+  padding-left: 0.35em; /* compense le letter-spacing de fin */
+}
+
+/* --- Divers -------------------------------------------------------------- */
+
+.pill {
+  display: inline-flex;
+  /* Empêche l'étirement quand une pill est enfant direct d'un grid/flex */
+  justify-self: start;
+  align-self: start;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  background: var(--cream-deep);
+  color: var(--ink-soft);
+}
+
+.pill-live { background: var(--plumb-glow); color: var(--plumb-deep); }
+
+.muted { color: var(--ink-soft); }
+.faint { color: var(--ink-faint); }
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.spin { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.pop-in { animation: pop-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* --- Grille de la vue room ------------------------------------------------ */
+/* Pensée pour une télé/vidéoprojecteur en paysage. Sur un écran étroit
+   (laptop en portrait, fenêtre réduite), on repasse en colonne unique. */
+
+.room-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.room-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 24px 24px 0;
+  min-height: 0;
+}
+
+@media (max-width: 900px) {
+  .room-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .room-aside {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0 24px 24px;
+  }
+}
+
+@media (max-width: 620px) {
+  .room-aside { flex-direction: column; }
+}
+
+/* Barre de scroll assortie au bois */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--oak);
+  border-radius: 999px;
+  border: 2px solid var(--cream);
+}
