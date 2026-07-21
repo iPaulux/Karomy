@@ -50,6 +50,81 @@
   --font-body:    'Nunito', system-ui, sans-serif;
 }
 
+/* ---------------------------------------------------------------------------
+   Thème « Birthday »
+   Même grammaire visuelle (bois, coins ronds, relief), palette qui vire au rose
+   bonbon et au doré. Appliqué via `data-theme` sur <html>, donc tout le monde
+   en hérite : écran room comme téléphones.
+   --------------------------------------------------------------------------- */
+
+:root[data-theme='birthday'] {
+  --cream:        #fff5f7;
+  --cream-deep:   #ffe3ea;
+  --parchment:    #fffbfc;
+
+  --oak:          #e2a4b6;
+  --oak-dark:     #bd7a8e;
+  --walnut:       #6e3a4b;
+
+  --blush:        #ff9fb4;
+  --blush-deep:   #dd6a85;
+  --sky:          #c3aef0;
+  --sky-deep:     #8a6fd0;
+  --butter:       #ffd166;
+  --lilac:        #f0a7d8;
+
+  --ink:          #5a3240;
+  --ink-soft:     #9d7280;
+  --ink-faint:    #caa6b3;
+
+  --shadow-sm:    0 2px 0 rgba(110, 58, 75, 0.14);
+  --shadow-md:    0 4px 0 rgba(110, 58, 75, 0.16), 0 8px 24px rgba(110, 58, 75, 0.12);
+  --shadow-lg:    0 8px 0 rgba(110, 58, 75, 0.14), 0 18px 40px rgba(110, 58, 75, 0.18);
+}
+
+/* Papier peint festif : guirlande de pois pastel par-dessus le damier. */
+:root[data-theme='birthday'] .wallpaper {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 209, 102, 0.5) 0 7px, transparent 8px),
+    radial-gradient(circle at 78% 12%, rgba(195, 174, 240, 0.5) 0 6px, transparent 7px),
+    radial-gradient(circle at 40% 82%, rgba(255, 159, 180, 0.45) 0 8px, transparent 9px),
+    radial-gradient(circle at 88% 70%, rgba(255, 209, 102, 0.4) 0 5px, transparent 6px),
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(255, 159, 180, 0.34), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 10% 110%, rgba(195, 174, 240, 0.3), transparent 70%),
+    repeating-linear-gradient(45deg, rgba(189, 122, 142, 0.05) 0 18px, transparent 18px 36px),
+    var(--cream);
+}
+
+/* --- Confettis ------------------------------------------------------------ */
+/* Purement décoratifs : `pointer-events: none` pour ne jamais gêner un clic. */
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.confetti i {
+  position: absolute;
+  top: -24px;
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  opacity: 0.85;
+  animation: confetti-fall linear infinite;
+}
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(-10vh) rotate(0deg); }
+  100% { transform: translateY(110vh) rotate(540deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti { display: none; }
+}
+
 * { box-sizing: border-box; }
 
 html, body, #root {

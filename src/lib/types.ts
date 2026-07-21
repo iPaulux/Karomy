@@ -1,9 +1,13 @@
 export type QueueStatus = 'queued' | 'playing' | 'done'
 
+/** Thème d'interface, choisi à la création de la room et partagé par tous. */
+export type RoomTheme = 'normal' | 'birthday'
+
 export interface Room {
   id: string
   code: string
   name: string
+  theme: RoomTheme
   is_playing: boolean
   current_id: string | null
   created_at: string

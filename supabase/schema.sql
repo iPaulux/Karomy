@@ -9,6 +9,8 @@ create table if not exists public.rooms (
   id           uuid primary key default gen_random_uuid(),
   code         text not null unique,
   name         text not null default 'Karaoké',
+  -- Thème d'interface, choisi à la création et partagé par tous les écrans.
+  theme        text not null default 'normal' check (theme in ('normal', 'birthday')),
   is_playing   boolean not null default false,
   current_id   uuid,
   created_at   timestamptz not null default now(),

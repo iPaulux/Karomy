@@ -2,19 +2,27 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createRoom, getRoomByCode } from '../lib/rooms'
 import { Wordmark } from '../components/Plumbob'
-import { IconMic, IconSpinner } from '../components/icons'
+import { IconCake, IconHome, IconMic, IconSpinner } from '../components/icons'
+import type { RoomTheme } from '../lib/types'
+import { useTheme } from '../lib/useTheme'
+import { Confetti } from '../components/Confetti'
 
 export function Home() {
   const navigate = useNavigate()
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState<'create' | 'join' | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [theme, setTheme] = useState<RoomTheme>('normal')
+
+  // L'accueil sert d'aperçu : on applique le thème dès qu'il est sélectionné,
+  // avant même que la room existe.
+  useTheme(theme)
 
   async function handleCreate() {
     setBusy('create')
     setError(null)
     try {
-      const room = await createRoom()
+      const room = await createRoom(theme)
       navigate(`/room/${room.code}`)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Création impossible.')
@@ -56,6 +64,8 @@ export function Home() {
         minHeight: '100dvh',
       }}
     >
+      {theme === 'birthday' && <Confetti count={18} />}
+
       <div style={{ textAlign: 'center' }}>
         <Wordmark size="lg" />
         <p className="muted" style={{ marginTop: 14, fontSize: '1.05rem', fontWeight: 600 }}>
@@ -69,6 +79,26 @@ export function Home() {
       >
         <div style={{ display: 'grid', gap: 10 }}>
           <span className="pill">Sur la télé</span>
+
+          <div className="segmented" role="tablist" aria-label="Thème de la room">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={theme === 'normal'}
+              onClick={() => setTheme('normal')}
+            >
+              <IconHome size={17} /> Cosy
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={theme === 'birthday'}
+              onClick={() => setTheme('birthday')}
+            >
+              <IconCake size={17} /> Anniversaire
+            </button>
+          </div>
+
           <button
             className="btn btn-primary btn-lg"
             onClick={handleCreate}

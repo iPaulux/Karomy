@@ -95,6 +95,21 @@ export const IconLink = ({ size }: IconProps) => (
   </Svg>
 )
 
+export const IconHome = ({ size }: IconProps) => (
+  <Svg size={size}>
+    <path d="M4 10.5 12 4l8 6.5V20H4z" {...stroke} />
+    <path d="M9.5 20v-5.5h5V20" {...stroke} />
+  </Svg>
+)
+
+export const IconCake = ({ size }: IconProps) => (
+  <Svg size={size}>
+    <path d="M4 20h16M4.5 20v-6h15v6" {...stroke} />
+    <path d="M4.5 16.5c1.6 0 1.6-1.4 3.2-1.4s1.6 1.4 3.2 1.4 1.6-1.4 3.2-1.4 1.6 1.4 3.2 1.4" {...stroke} />
+    <path d="M12 11V8M12 4.5v1.2" {...stroke} />
+  </Svg>
+)
+
 export const IconSpinner = ({ size = 22 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className="spin" aria-hidden="true">
     <circle cx="12" cy="12" r="9" {...stroke} opacity="0.25" />

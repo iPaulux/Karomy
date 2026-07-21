@@ -7,7 +7,9 @@ import { QrCode } from '../components/QrCode'
 import { Plumbob, Wordmark } from '../components/Plumbob'
 import { IconPause, IconPlay, IconSkip, IconSpinner } from '../components/icons'
 import { Screen } from '../components/Screen'
-import type { QueueItem } from '../lib/types'
+import { Confetti } from '../components/Confetti'
+import { useTheme } from '../lib/useTheme'
+import type { QueueItem, RoomTheme } from '../lib/types'
 
 /**
  * Vue "room" : l'écran partagé (télé, vidéoprojecteur, laptop).
@@ -16,6 +18,8 @@ import type { QueueItem } from '../lib/types'
 export function RoomView() {
   const { code } = useParams<{ code: string }>()
   const { room, queue, current, loading, error } = useRoom(code)
+
+  useTheme(room?.theme)
 
   const joinUrl = `${window.location.origin}/j/${code?.toUpperCase() ?? ''}`
   const upcoming = queue.filter((q) => q.status === 'queued')
@@ -67,6 +71,8 @@ export function RoomView() {
 
   return (
     <div className="wallpaper room-grid">
+      {room.theme === 'birthday' && <Confetti />}
+
       {/* ---- Scène : la vidéo karaoké et ses contrôles ---- */}
       <main style={{ display: 'flex', flexDirection: 'column', padding: 24, gap: 18, minWidth: 0 }}>
         <div
@@ -87,7 +93,7 @@ export function RoomView() {
               onEnded={handleNext}
             />
           ) : (
-            <IdleStage joinUrl={joinUrl} code={room.code} />
+            <IdleStage joinUrl={joinUrl} code={room.code} theme={room.theme} />
           )}
         </div>
 
@@ -176,7 +182,15 @@ export function RoomView() {
 }
 
 /** Écran d'accueil affiché quand aucune chanson n'est en cours. */
-function IdleStage({ joinUrl, code }: { joinUrl: string; code: string }) {
+function IdleStage({
+  joinUrl,
+  code,
+  theme,
+}: {
+  joinUrl: string
+  code: string
+  theme: RoomTheme
+}) {
   return (
     <div
       className="wallpaper"
@@ -194,7 +208,7 @@ function IdleStage({ joinUrl, code }: { joinUrl: string; code: string }) {
     >
       <Plumbob size={80} />
       <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: 'var(--walnut)' }}>
-        À qui le tour&nbsp;?
+        {theme === 'birthday' ? 'Joyeux anniversaire !' : 'À qui le tour ?'}
       </h1>
       <QrCode value={joinUrl} size={200} />
       <p className="muted" style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>

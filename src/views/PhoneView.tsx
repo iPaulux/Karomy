@@ -5,6 +5,8 @@ import { addToQueue, moveItem, removeFromQueue } from '../lib/rooms'
 import { SearchUnavailableError, parseVideoId, searchKaraoke, thumbnailFor } from '../lib/youtube'
 import { Plumbob, Wordmark } from '../components/Plumbob'
 import { Screen } from '../components/Screen'
+import { Confetti } from '../components/Confetti'
+import { useTheme } from '../lib/useTheme'
 import {
   IconCheck,
   IconDown,
@@ -31,6 +33,8 @@ export function PhoneView() {
   const { room, queue, current, loading, error, refresh } = useRoom(code)
   const [singer, setSinger] = useState(() => localStorage.getItem(NAME_KEY) ?? '')
 
+  useTheme(room?.theme)
+
   if (loading) return <Screen><IconSpinner size={44} /></Screen>
   if (error || !room) return <Screen>{error ?? 'Room introuvable.'}</Screen>
 
@@ -53,6 +57,8 @@ export function PhoneView() {
       className="wallpaper"
       style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}
     >
+      {room.theme === 'birthday' && <Confetti count={14} />}
+
       <header
         style={{
           display: 'flex',

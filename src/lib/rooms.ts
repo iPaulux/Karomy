@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import type { QueueItem, Room, SearchResult } from './types'
+import type { QueueItem, Room, RoomTheme, SearchResult } from './types'
 
 /** Alphabet sans I/O/0/1 : évite les confusions quand on dicte un code. */
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -13,11 +13,11 @@ function randomCode(length = 4): string {
  * Crée une room avec un code court unique. En cas de collision (rare mais
  * possible sur 32^4 ≈ 1M combinaisons), on retente avec un nouveau code.
  */
-export async function createRoom(name = 'Karaoké'): Promise<Room> {
+export async function createRoom(theme: RoomTheme = 'normal', name = 'Karaoké'): Promise<Room> {
   for (let attempt = 0; attempt < 6; attempt++) {
     const { data, error } = await supabase
       .from('rooms')
-      .insert({ code: randomCode(), name })
+      .insert({ code: randomCode(), name, theme })
       .select()
       .single()
 
