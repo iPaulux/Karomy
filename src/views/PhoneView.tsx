@@ -173,7 +173,7 @@ export function PhoneView() {
                     <button
                       className="btn btn-ghost btn-sm"
                       style={{ width: 32, height: 32, padding: 0, borderRadius: '50%', color: 'var(--blush-deep)' }}
-                      onClick={() => void removeFromQueue(item.id)}
+                      onClick={() => void removeFromQueue(item.id).then(refresh)}
                       aria-label="Retirer ma chanson"
                     >
                       <IconTrash size={16} />

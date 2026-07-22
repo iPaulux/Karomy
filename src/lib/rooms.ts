@@ -74,8 +74,20 @@ export async function addToQueue(
   if (error) throw error
 }
 
+/**
+ * Retire un morceau de la file.
+ *
+ * Volontairement un soft-delete (`status = 'done'`) et non un vrai DELETE :
+ * l'événement realtime d'un DELETE ne transporte que la clé primaire de la
+ * ligne supprimée, jamais son `room_id` — le filtre `postgres_changes` de
+ * useRoom ne le laisserait donc pas passer et aucun écran ne serait prévenu.
+ * Un UPDATE transporte la ligne complète et se propage normalement.
+ */
 export async function removeFromQueue(itemId: string): Promise<void> {
-  const { error } = await supabase.from('queue_items').delete().eq('id', itemId)
+  const { error } = await supabase
+    .from('queue_items')
+    .update({ status: 'done' })
+    .eq('id', itemId)
   if (error) throw error
 }
 
